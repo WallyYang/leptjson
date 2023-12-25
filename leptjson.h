@@ -6,16 +6,16 @@ typedef enum { LEPT_NULL, LEPT_FALSE, LEPT_TRUE, LEPT_NUMBER, LEPT_STRING, LEPT_
 extern const char* LEPT_TYPES[];
 
 typedef struct {
-		double n;
-		lept_type type;
+    double n;
+    lept_type type;
 } lept_value;
 
 enum {
-		LEPT_PARSE_OK = 0,
-		LEPT_PARSE_EXPECT_VALUE,
-		LEPT_PARSE_INVALID_VALUE,
-		LEPT_PARSE_ROOT_NOT_SINGULAR,
-		LEPT_PARSE_NUMBER_TOO_BIG
+    LEPT_PARSE_OK = 0,
+    LEPT_PARSE_EXPECT_VALUE,
+    LEPT_PARSE_INVALID_VALUE,
+    LEPT_PARSE_ROOT_NOT_SINGULAR,
+    LEPT_PARSE_NUMBER_TOO_BIG
 };
 
 extern const char* PARSE_RESULTS[];
