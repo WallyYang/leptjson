@@ -9,6 +9,24 @@ typedef struct {
 		const char* json;
 } lept_context;
 
+const char* LEPT_TYPES[] = {
+		"LEPT_NULL",
+		"LEPT_FALSE",
+		"LEPT_TRUE",
+		"LEPT_NUMBER",
+		"LEPT_STRING",
+		"LEPT_ARRAY",
+		"LEPT_OBJECT",
+};
+
+const char* PARSE_RESULTS[] = {
+		"LEPT_PARSE_OK",
+		"LEPT_PARSE_EXPECT_VALUE",
+		"LEPT_PARSE_INVALID_VALUE",
+		"LEPT_PARSE_ROOT_NOT_SINGULAR",
+		"LEPT_PARSE_NUMBER_TOO_BIG",
+};
+
 static void lept_parse_whitespace(lept_context* c) {
 		const char *p = c->json;
 		while (*p == ' ' || *p == '\t' || *p == '\r')

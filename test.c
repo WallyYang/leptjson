@@ -23,41 +23,45 @@ static int test_pass = 0;
 
 #define EXPECT_EQ_DOUBLE(expect, actual) EXPECT_EQ_BASE((expect) == (actual), expect, actual, "%.17g")
 
+#define EXPECT_EQ_RESULT(expect, actual) EXPECT_EQ_BASE((expect) == (actual), PARSE_RESULTS[expect], PARSE_RESULTS[actual], "%s")
+
+#define EXPECT_EQ_TYPE(expect, actual) EXPECT_EQ_BASE((expect) == (actual), LEPT_TYPES[expect], LEPT_TYPES[actual], "%s")
+
 #define TEST_ERROR(error, json)													\
 		do {																								\
 				lept_value v;																		\
 				v.type = LEPT_FALSE;														\
-				EXPECT_EQ_INT(error, lept_parse(&v, json));	\
-				EXPECT_EQ_INT(LEPT_NULL, lept_get_type(&v));		\
+				EXPECT_EQ_RESULT(error, lept_parse(&v, json));	\
+				EXPECT_EQ_TYPE(LEPT_NULL, lept_get_type(&v));		\
 		} while(0)
 
 #define TEST_NUMBER(expect, json)																\
 		do {																												\
 				lept_value v;																						\
-				EXPECT_EQ_INT(LEPT_PARSE_OK, lept_parse(&v, json));	\
-				EXPECT_EQ_INT(LEPT_NUMBER, lept_get_type(&v));					\
+				EXPECT_EQ_RESULT(LEPT_PARSE_OK, lept_parse(&v, json));	\
+				EXPECT_EQ_TYPE(LEPT_NUMBER, lept_get_type(&v));					\
 				EXPECT_EQ_DOUBLE(expect, lept_get_number(&v));					\
 		} while(0)
 
 static void test_parse_null() {
 		lept_value v;
 		v.type = LEPT_FALSE;
-		EXPECT_EQ_INT(LEPT_PARSE_OK, lept_parse(&v, "null"));
-		EXPECT_EQ_INT(LEPT_NULL, lept_get_type(&v));
+		EXPECT_EQ_RESULT(LEPT_PARSE_OK, lept_parse(&v, "null"));
+		EXPECT_EQ_TYPE(LEPT_NULL, lept_get_type(&v));
 }
 
 static void test_parse_true() {
 		lept_value v;
 		v.type = LEPT_FALSE;
-		EXPECT_EQ_INT(LEPT_PARSE_OK, lept_parse(&v, "true"));
-		EXPECT_EQ_INT(LEPT_TRUE, lept_get_type(&v));
+		EXPECT_EQ_RESULT(LEPT_PARSE_OK, lept_parse(&v, "true"));
+		EXPECT_EQ_TYPE(LEPT_TRUE, lept_get_type(&v));
 }
 
 static void test_parse_false() {
 		lept_value v;
 		v.type = LEPT_NULL;
-		EXPECT_EQ_INT(LEPT_PARSE_OK, lept_parse(&v, "false"));
-		EXPECT_EQ_INT(LEPT_FALSE, lept_get_type(&v));
+		EXPECT_EQ_RESULT(LEPT_PARSE_OK, lept_parse(&v, "false"));
+		EXPECT_EQ_TYPE(LEPT_FALSE, lept_get_type(&v));
 }
 
 static void test_parse_number() {

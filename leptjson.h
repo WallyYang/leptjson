@@ -3,6 +3,8 @@
 
 typedef enum { LEPT_NULL, LEPT_FALSE, LEPT_TRUE, LEPT_NUMBER, LEPT_STRING, LEPT_ARRAY, LEPT_OBJECT } lept_type;
 
+extern const char* LEPT_TYPES[];
+
 typedef struct {
 		double n;
 		lept_type type;
@@ -15,6 +17,8 @@ enum {
 		LEPT_PARSE_ROOT_NOT_SINGULAR,
 		LEPT_PARSE_NUMBER_TOO_BIG
 };
+
+extern const char* PARSE_RESULTS[];
 
 int lept_parse(lept_value *v, const char *json);
 
