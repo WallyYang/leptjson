@@ -1,4 +1,6 @@
 #include <assert.h> /* assert() */
+#include <errno.h>  /* errno */
+#include <math.h>   /* HUGE_VAL */
 #include <stdlib.h> /* NULL, strtod() */
 #include <string.h> /* strlen() */
 
@@ -52,14 +54,12 @@ static int lept_parse_literal(lept_context* c, lept_value* v, const char* litera
 }
 
 static int lept_parse_number(lept_context* c, lept_value* v) {
-    char* end;
-
     if (!(ISDIGIT(*c->json) || *c->json == '-') || c->json[strlen(c->json)-1] == '.')
         return LEPT_PARSE_INVALID_VALUE;
-    v->n = strtod(c->json, &end);
-    if (c->json == end)
-        return LEPT_PARSE_INVALID_VALUE;
-    c->json = end;
+    v->n = strtod(c->json, NULL);
+    if (errno == ERANGE && (v->n == HUGE_VAL || v->n == -HUGE_VAL))
+        return LEPT_PARSE_NUMBER_TOO_BIG;
+    c->json += strlen(c->json);
     v->type = LEPT_NUMBER;
     return LEPT_PARSE_OK;
 }
