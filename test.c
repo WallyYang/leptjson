@@ -83,7 +83,12 @@ static void test_parse_number() {
     TEST_NUMBER(-1E-10, "-1E-10");
     TEST_NUMBER(1.234E+10, "1.234E+10");
     TEST_NUMBER(1.234E-10, "1.234E-10");
-    TEST_NUMBER(0.0, "1e-10000"); /* must underflow */
+    TEST_NUMBER(0.0, "1e-10000");                                    /* must underflow */
+    TEST_NUMBER(1.0000000000000002, "1.0000000000000002");           /* smallest number > 1 */
+    TEST_NUMBER(4.9406564584124654E-324, "4.9406564584124654E-324"); /* min subnormal positive double */
+    TEST_NUMBER(2.2250738585072009E-308, "2.2250738585072009E-308"); /* max subnormal double */
+    TEST_NUMBER(2.2250738585072014E-308, "2.2250738585072014E-308"); /* min normal positive double */
+    TEST_NUMBER(1.7976931348623157E308, "1.7976931348623157E308");   /* max double */
 }
 
 static void test_parse_expect_value() {
