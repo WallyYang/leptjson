@@ -23,6 +23,12 @@ static int test_pass = 0;
 
 #define EXPECT_EQ_DOUBLE(expect, actual) EXPECT_EQ_BASE((expect) == (actual), expect, actual, "%.17g")
 
+#define EXPECT_EQ_STRING(expect, actual, alength)                       \
+    EXPECT_EQ_BASE(sizeof(expect) - 1 == (alength) && memcmp(expect, actual, alength) == 0, expect, actual, "%s")
+
+#define EXPECT_TRUE(actual) EXPECT_EQ_BASE((actual) != 0, "true", "false", "%s")
+#define EXPECT_FALSE(actual) EXPECT_EQ_BASE((actual) == 0, "false", "true", "%s")
+
 #define EXPECT_EQ_RESULT(expect, actual) EXPECT_EQ_BASE((expect) == (actual), PARSE_RESULTS[expect], PARSE_RESULTS[actual], "%s")
 
 #define EXPECT_EQ_TYPE(expect, actual) EXPECT_EQ_BASE((expect) == (actual), LEPT_TYPES[expect], LEPT_TYPES[actual], "%s")
@@ -30,38 +36,60 @@ static int test_pass = 0;
 #define TEST_ERROR(error, json)                         \
     do {                                                \
         lept_value v;                                   \
+        lept_init(&v);                                  \
         v.type = LEPT_FALSE;                            \
         EXPECT_EQ_RESULT(error, lept_parse(&v, json));  \
         EXPECT_EQ_TYPE(LEPT_NULL, lept_get_type(&v));   \
+        lept_free(&v);                                  \
     } while(0)
 
 #define TEST_NUMBER(expect, json)                               \
     do {                                                        \
         lept_value v;                                           \
+        lept_init(&v);                                          \
         EXPECT_EQ_RESULT(LEPT_PARSE_OK, lept_parse(&v, json));  \
         EXPECT_EQ_TYPE(LEPT_NUMBER, lept_get_type(&v));         \
         EXPECT_EQ_DOUBLE(expect, lept_get_number(&v));          \
+        lept_free(&v);                                          \
+    } while(0)
+
+#define TEST_STRING(expect, json)\
+    do {                                                                \
+        lept_value v;                                                   \
+        lept_init(&v);                                                  \
+        EXPECT_EQ_RESULT(LEPT_PARSE_OK, lept_parse(&v, json));          \
+        EXPECT_EQ_TYPE(LEPT_STRING, lept_get_type(&v));                 \
+        EXPECT_EQ_STRING(expect, lept_get_string(&v), lept_get_string_length(&v)); \
+        lept_free(&v);                                                  \
     } while(0)
 
 static void test_parse_null() {
     lept_value v;
-    v.type = LEPT_FALSE;
+    lept_init(&v);
+    lept_set_boolean(&v, 0);
     EXPECT_EQ_RESULT(LEPT_PARSE_OK, lept_parse(&v, "null"));
     EXPECT_EQ_TYPE(LEPT_NULL, lept_get_type(&v));
+    lept_free(&v);
 }
 
 static void test_parse_true() {
     lept_value v;
+    lept_init(&v);
+    lept_set_boolean(&v, 0);
     v.type = LEPT_FALSE;
     EXPECT_EQ_RESULT(LEPT_PARSE_OK, lept_parse(&v, "true"));
     EXPECT_EQ_TYPE(LEPT_TRUE, lept_get_type(&v));
+    lept_free(&v);
 }
 
 static void test_parse_false() {
     lept_value v;
+    lept_init(&v);
+    lept_set_boolean(&v, 1);
     v.type = LEPT_NULL;
     EXPECT_EQ_RESULT(LEPT_PARSE_OK, lept_parse(&v, "false"));
     EXPECT_EQ_TYPE(LEPT_FALSE, lept_get_type(&v));
+    lept_free(&v);
 }
 
 static void test_parse_number() {
@@ -93,6 +121,15 @@ static void test_parse_number() {
     TEST_NUMBER(-2.2250738585072014E-308, "-2.2250738585072014E-308");
     TEST_NUMBER(1.7976931348623157E308, "1.7976931348623157E308");   /* max double */
     TEST_NUMBER(-1.7976931348623157E308, "-1.7976931348623157E308");
+}
+
+static void test_parse_string() {
+    TEST_STRING("", "\"\"");
+    TEST_STRING("Hello", "\"Hello\"");
+/* #if 0 */
+    TEST_STRING("Helo\nWorld", "\"Hello\\nWorld\"");
+    TEST_STRING("\" \\ / \b \f \n \r \t", "\"\\\" \\\\ \\/ \\b \\f \\n \\r \\t\"");
+/* #endif */
 }
 
 static void test_parse_expect_value() {
@@ -135,6 +172,55 @@ static void test_parse_number_too_big() {
     TEST_ERROR(LEPT_PARSE_NUMBER_TOO_BIG, "-1e309");
 }
 
+static void test_parse_missing_quotation_mark() {
+    TEST_ERROR(LEPT_PARSE_MISS_QUOTATION_MARK, "\"");
+    TEST_ERROR(LEPT_PARSE_MISS_QUOTATION_MARK, "\"abc");
+}
+
+static void test_parse_invalid_string_escape() {
+#if 0
+    TEST_ERROR(LEPT_PARSE_INVALID_STRING_ESCAPE, "\"\\v\"");
+    TEST_ERROR(LEPT_PARSE_INVALID_STRING_ESCAPE, "\"\\'\"");
+    TEST_ERROR(LEPT_PARSE_INVALID_STRING_ESCAPE, "\"\\0\"");
+    TEST_ERROR(LEPT_PARSE_INVALID_STRING_ESCAPE, "\"\\x12\"");
+#endif
+}
+
+static void test_parse_invalid_string_char() {
+#if 0
+    TEST_ERROR(LEPT_PARSE_INVALID_STRING_CHAR, "\"\x01\"");
+    TEST_ERROR(LEPT_PARSE_INVALID_STRING_CHAR, "\"\x1F\"");
+#endif
+}
+
+static void test_access_null() {
+    lept_value v;
+    lept_init(&v);
+    lept_set_string(&v, "a", 1);
+    lept_set_null(&v);
+    EXPECT_EQ_TYPE(LEPT_NULL, lept_get_type(&v));
+    lept_free(&v);
+}
+
+static void test_access_boolean() {
+    /* \TODO */
+    /* Use EXPECT_TRUE() and EXPECT_FALSE() */
+}
+
+static void test_access_number() {
+    /* \TODO */
+}
+
+static void test_access_string() {
+    lept_value v;
+    lept_init(&v);
+    lept_set_string(&v, "", 0);
+    EXPECT_EQ_STRING("", lept_get_string(&v), lept_get_string_length(&v));
+    lept_set_string(&v, "Hello", 5);
+    EXPECT_EQ_STRING("Hello", lept_get_string(&v), lept_get_string_length(&v));
+    lept_free(&v);
+}
+
 static void test_parse() {
     test_parse_null();
     test_parse_true();
@@ -144,6 +230,14 @@ static void test_parse() {
     test_parse_invalid_value();
     test_parse_root_not_singular();
     test_parse_number_too_big();
+    test_parse_missing_quotation_mark();
+    test_parse_invalid_string_escape();
+    test_parse_invalid_string_char();
+
+    test_access_null();
+    test_access_boolean();
+    test_access_number();
+    test_access_string();
 }
 
 int main() {
