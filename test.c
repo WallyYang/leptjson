@@ -126,10 +126,10 @@ static void test_parse_number() {
 static void test_parse_string() {
     TEST_STRING("", "\"\"");
     TEST_STRING("Hello", "\"Hello\"");
-/* #if 0 */
-    TEST_STRING("Helo\nWorld", "\"Hello\\nWorld\"");
+#if 0
+    TEST_STRING("Hello\nWorld", "\"Hello\\nWorld\"");
     TEST_STRING("\" \\ / \b \f \n \r \t", "\"\\\" \\\\ \\/ \\b \\f \\n \\r \\t\"");
-/* #endif */
+#endif
 }
 
 static void test_parse_expect_value() {
@@ -226,6 +226,7 @@ static void test_parse() {
     test_parse_true();
     test_parse_false();
     test_parse_number();
+    test_parse_string();
     test_parse_expect_value();
     test_parse_invalid_value();
     test_parse_root_not_singular();
