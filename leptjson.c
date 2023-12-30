@@ -126,30 +126,14 @@ static int lept_parse_string(lept_context* c, lept_value* v) {
         case '\\':
             ch = *p++;
             switch (ch) {
-            case '"':
-                PUTC(c, '"');
-                break;
-            case '\\':
-                PUTC(c, '\\');
-                break;
-            case '/':
-                PUTC(c, '/');
-                break;
-            case 'b':
-                PUTC(c, '\b');
-                break;
-            case 'f':
-                PUTC(c, '\f');
-                break;
-            case 'n':
-                PUTC(c, '\n');
-                break;
-            case 'r':
-                PUTC(c, '\r');
-                break;
-            case 't':
-                PUTC(c, '\t');
-                break;
+            case '"':  PUTC(c, '"');  break;
+            case '\\': PUTC(c, '\\'); break;
+            case '/':  PUTC(c, '/');  break;
+            case 'b':  PUTC(c, '\b'); break;
+            case 'f':  PUTC(c, '\f'); break;
+            case 'n':  PUTC(c, '\n'); break;
+            case 'r':  PUTC(c, '\r'); break;
+            case 't':  PUTC(c, '\t'); break;
             default:
                 c ->top = head;
                 return LEPT_PARSE_INVALID_STRING_ESCAPE;
