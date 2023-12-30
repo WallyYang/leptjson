@@ -216,19 +216,13 @@ lept_type lept_get_type(const lept_value *v) {
 
 int lept_get_boolean(const lept_value *v) {
     assert(v != NULL && (v->type == LEPT_TRUE || v->type == LEPT_FALSE));
-    if (v->type == LEPT_TRUE)
-        return 1;
-    else
-        return 0;
+    return v->type == LEPT_TRUE;
 }
 
 void lept_set_boolean(lept_value *v, int b) {
     assert(v != NULL && (b == 0 || b == 1));
     lept_free(v);
-    if (b == 1)
-        v->type = LEPT_TRUE;
-    else
-        v->type = LEPT_FALSE;
+    v->type = b? LEPT_TRUE : LEPT_FALSE;
 }
 
 double lept_get_number(const lept_value* v) {
