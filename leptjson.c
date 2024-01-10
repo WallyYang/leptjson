@@ -14,6 +14,8 @@
 #define ISDIGIT(ch)         ((ch) >= '0' && (ch) <= '9')
 #define ISDIGIT1TO9(ch)     ((ch) >= '1' && (ch) <= '9')
 #define PUTC(c, ch)    do { *(char*)lept_context_push(c, sizeof(char)) = (ch); } while(0)
+#define ISHEX(ch) \
+    (((ch) >= '0' && (ch) <= '9') || ((ch) >= 'a' && (ch) <= 'f') || ((ch) >= 'A' && (ch) <= 'F'))
 
 typedef struct {
     const char* json;
@@ -113,11 +115,20 @@ static int lept_parse_number(lept_context* c, lept_value* v) {
 }
 
 static const char* lept_parse_hex4(const char* p, unsigned* u) {
-    /* \TODO */
-    return p;
+    size_t i;
+    char* copy = malloc(5 * sizeof(char));
+    memcpy(copy, p, 4);
+    copy[4] = '\0';
+    for (i = 0; i < 4; ++i) {
+        if (!ISHEX(*(p+i)))
+            return NULL;
+    }
+    *u = strtol(p, NULL, 16);
+    return p+4;
 }
 
 static void lept_encode_utf8(lept_context* c, unsigned u) {
+    assert(u <= 0x10FFF);
     /* \TODO */
 }
 
