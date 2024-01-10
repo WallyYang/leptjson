@@ -123,7 +123,8 @@ static const char* lept_parse_hex4(const char* p, unsigned* u) {
         if (!ISHEX(*(p+i)))
             return NULL;
     }
-    *u = strtol(p, NULL, 16);
+    *u = strtol(copy, NULL, 16);
+
     return p+4;
 }
 
