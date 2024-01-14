@@ -282,6 +282,13 @@ void lept_free(lept_value* v) {
     assert(v != NULL);
     if (v->type == LEPT_STRING)
         free(v->u.s.s);
+    else if (v->type == LEPT_ARRAY) {
+        size_t i;
+        for (i = 0; i < v->u.a.size; i++) {
+            lept_free(lept_get_array_element(v, i));
+        }
+        free(v->u.a.e);
+    }
     v->type = LEPT_NULL;
 }
 
