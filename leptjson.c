@@ -166,7 +166,7 @@ static int lept_parse_string_raw(lept_context* c, char** str, size_t* len) {
         switch (ch) {
         case '\"':
             *len = c->top - head;
-            memcpy(*str = malloc(*len * sizeof(char)), (const char*)lept_context_pop(c, *len), *len);
+            *str = lept_context_pop(c, *len);
             c->json = p;
             return LEPT_PARSE_OK;
         case '\\':
