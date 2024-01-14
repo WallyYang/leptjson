@@ -156,11 +156,7 @@ static void lept_encode_utf8(lept_context* c, unsigned u) {
 /* Parse JSON string, write result into @str and @len */
 /* str points to c->stack element */
 static int lept_parse_string_raw(lept_context* c, char** str, size_t* len) {
-    /* \TODO */
-}
-
-static int lept_parse_string(lept_context* c, lept_value* v) {
-    size_t head = c->top, len;
+    size_t head = c->top;
     unsigned u;
     const char* p;
     EXPECT(c, '\"');
@@ -169,8 +165,8 @@ static int lept_parse_string(lept_context* c, lept_value* v) {
         char ch = *p++;
         switch (ch) {
         case '\"':
-            len = c->top - head;
-            lept_set_string(v, (const char*)lept_context_pop(c, len), len);
+            *len = c->top - head;
+            memcpy(*str = malloc(*len * sizeof(char)), (const char*)lept_context_pop(c, *len), *len);
             c->json = p;
             return LEPT_PARSE_OK;
         case '\\':
@@ -213,6 +209,15 @@ static int lept_parse_string(lept_context* c, lept_value* v) {
             PUTC(c, ch);
         }
     }
+}
+
+static int lept_parse_string(lept_context* c, lept_value* v) {
+    int ret;
+    char *s;
+    size_t len;
+    if ((ret = lept_parse_string_raw(c, &s, &len)) == LEPT_PARSE_OK)
+        lept_set_string(v, s, len);
+    return ret;
 }
 
 static int lept_parse_array(lept_context* c, lept_value* v) {
