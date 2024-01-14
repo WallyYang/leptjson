@@ -295,6 +295,7 @@ static int lept_parse_object(lept_context* c, lept_value* v) {
             c->json++;
         else {
             ret = LEPT_PARSE_MISS_COLON;
+            free(m.k);
             break;
         }
         lept_parse_whitespace(c);
@@ -378,6 +379,13 @@ void lept_free(lept_value* v) {
             lept_free(lept_get_array_element(v, i));
         }
         free(v->u.a.e);
+        break;
+    case LEPT_OBJECT:
+        for (i = 0; i < v->u.o.size; i++) {
+            free(v->u.o.m[i].k);
+            lept_free(&v->u.o.m[i].v);
+        }
+        free(v->u.o.m);
         break;
     default:
         break;
