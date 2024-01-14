@@ -159,8 +159,10 @@ static void test_parse_array() {
     EXPECT_EQ_TYPE(LEPT_ARRAY, lept_get_type(&v));
     EXPECT_EQ_SIZE_T(5, lept_get_array_size(&v));
     EXPECT_EQ_TYPE(LEPT_NULL, lept_get_type(lept_get_array_element(&v, 0)));
-    EXPECT_FALSE(lept_get_boolean(lept_get_array_element(&v, 1)));
-    EXPECT_TRUE(lept_get_boolean(lept_get_array_element(&v, 2)));
+    EXPECT_EQ_TYPE(LEPT_FALSE, lept_get_type(lept_get_array_element(&v, 1)));
+    EXPECT_EQ_TYPE(LEPT_TRUE, lept_get_type(lept_get_array_element(&v, 2)));
+    EXPECT_EQ_TYPE(LEPT_NUMBER, lept_get_type(lept_get_array_element(&v, 3)));
+    EXPECT_EQ_TYPE(LEPT_STRING, lept_get_type(lept_get_array_element(&v, 4)));
     EXPECT_EQ_DOUBLE(123.0, lept_get_number(lept_get_array_element(&v, 3)));
     EXPECT_EQ_STRING("abc", lept_get_string(lept_get_array_element(&v, 4)), 3);
     lept_free(&v);
