@@ -305,6 +305,7 @@ static void test_parse_number_too_big() {
 static void test_parse_missing_quotation_mark() {
     TEST_ERROR(LEPT_PARSE_MISS_QUOTATION_MARK, "\"");
     TEST_ERROR(LEPT_PARSE_MISS_QUOTATION_MARK, "\"abc");
+    TEST_ERROR(LEPT_PARSE_MISS_QUOTATION_MARK, "{\"a:1,");
 }
 
 static void test_parse_invalid_string_escape() {
