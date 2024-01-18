@@ -1,7 +1,7 @@
 #include <assert.h> /* assert() */
 #include <errno.h>  /* errno, ERANGE */
 #include <math.h>   /* HUGE_VAL */
-#include <stdio.h> /* sprintf() */
+#include <stdio.h>  /* sprintf() */
 #include <stdlib.h> /* NULL, malloc(), realloc(), free(), strtod() */
 #include <string.h> /* memcpy(), strlen() */
 
