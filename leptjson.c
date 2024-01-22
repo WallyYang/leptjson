@@ -56,6 +56,13 @@ const char* PARSE_RESULTS[] = {
 
 static int lept_parse_value(lept_context* c, lept_value* v); /* Forward Declaration */
 
+static char to_hex(int digit) {
+    if (digit >= 10)
+        return 'a' + digit - 10;
+    else
+        return '0' + digit;
+}
+
 static void* lept_context_push(lept_context* c, size_t size) {
     void* ret;
     assert(size > 0);
@@ -374,7 +381,44 @@ int lept_parse(lept_value *v, const char *json) {
 }
 
 static void lept_stringify_string(lept_context* c, const char* s, size_t len) {
-    /* ... */
+    int idx = 0;
+    PUTC(c, '\"');
+    while (idx < len) {
+        unsigned u = *(s+idx);
+        switch (u) {
+        case '"':
+            PUTS(c, "\\\"", 2);
+            break;
+        case '\\':
+            PUTS(c, "\\\\", 2);
+            break;
+        case '\b':
+            PUTS(c, "\\b", 2);
+            break;
+        case '\f':
+            PUTS(c, "\\f", 2);
+            break;
+        case '\n':
+            PUTS(c, "\\n", 2);
+            break;
+        case '\r':
+            PUTS(c, "\\r", 2);
+            break;
+        case '\t':
+            PUTS(c, "\\t", 2);
+            break;
+        default:
+            if (u < 0x20) {
+                PUTS(c, "\\u00", 4);
+                PUTC(c, to_hex(u / 16));
+                PUTC(c, to_hex(u % 16));
+            } else {
+                PUTC(c, u);
+            }
+        }
+        ++idx;
+    }
+    PUTC(c, '\"');
 }
 
 static void lept_stringify_value(lept_context* c, const lept_value* v) {
