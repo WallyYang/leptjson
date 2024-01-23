@@ -443,13 +443,13 @@ static void test_stringify_string() {
 
 static void test_stringify_array() {
     TEST_ROUNDTRIP("[]");
-    TEST_ROUNDTRIP("[null,false,true,123,\"abc\", [1,2,3]]");
+    TEST_ROUNDTRIP("[null,false,true,123,\"abc\",[1,2,3]]");
 }
 
 static void test_stringify_object() {
     TEST_ROUNDTRIP("{}");
     TEST_ROUNDTRIP("{\"n\":null,\"f\":false,\"t\":true,\"i\":123,\"s\":\"abc\",\"a\":[1,2,3],"
-                   "\"o\":{\"1\":1, \"2\":2, \"3\":3}}");
+                   "\"o\":{\"1\":1,\"2\":2,\"3\":3}}");
 }
 
 static void test_stringify() {

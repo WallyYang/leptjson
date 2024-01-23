@@ -56,6 +56,8 @@ const char* PARSE_RESULTS[] = {
 
 static int lept_parse_value(lept_context* c, lept_value* v); /* Forward Declaration */
 
+static void lept_stringify_value(lept_context* c, const lept_value* v); /* Forward Declaration */
+
 static char to_hex(int digit) {
     if (digit >= 10)
         return 'a' + digit - 10;
@@ -422,6 +424,7 @@ static void lept_stringify_string(lept_context* c, const char* s, size_t len) {
 }
 
 static void lept_stringify_value(lept_context* c, const lept_value* v) {
+    size_t i;
     switch (v->type) {
     case LEPT_NULL:  PUTS(c, "null",  4); break;
     case LEPT_FALSE: PUTS(c, "false", 5); break;
@@ -429,10 +432,24 @@ static void lept_stringify_value(lept_context* c, const lept_value* v) {
     case LEPT_NUMBER: c->top -= 32 - sprintf(lept_context_push(c, 32), "%.17g", v->u.n); break;
     case LEPT_STRING: lept_stringify_string(c, v->u.s.s, v->u.s.len); break;
     case LEPT_ARRAY:
-        /* ... */
+        PUTC(c, '[');
+        for (i = 0; i < v->u.a.size; i++) {
+            lept_stringify_value(c, &v->u.a.e[i]);
+            if (i != v->u.a.size - 1)
+                PUTC(c, ',');
+        }
+        PUTC(c, ']');
         break;
     case LEPT_OBJECT:
-        /* ... */
+        PUTC(c, '{');
+        for (i = 0; i < v->u.o.size; i++) {
+            lept_stringify_string(c, v->u.o.m[i].k, v->u.o.m[i].klen);
+            PUTC(c, ':');
+            lept_stringify_value(c, &v->u.o.m[i].v);
+            if (i != v->u.o.size - 1)
+                PUTC(c, ',');
+        }
+        PUTC(c, '}');
         break;
     default: assert(0 && "invalid type");
     }
