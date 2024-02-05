@@ -532,7 +532,7 @@ static void test_swap() {
     lept_init(&v1);
     lept_init(&v2);
     lept_set_string(&v1, "Hello", 5);
-    lept_set_string(&v1, "World!", 6);
+    lept_set_string(&v2, "World!", 6);
     lept_swap(&v1, &v2);
     EXPECT_EQ_STRING("World!", lept_get_string(&v1), lept_get_string_length(&v1));
     EXPECT_EQ_STRING("Hello", lept_get_string(&v2), lept_get_string_length(&v2));
