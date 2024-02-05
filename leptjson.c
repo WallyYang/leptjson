@@ -530,6 +530,18 @@ int lept_is_equal(const lept_value *lhs, const lept_value *rhs) {
             if (!lept_is_equal(&lhs->u.a.e[i], &rhs->u.a.e[i]))
                 return 0;
         return 1;
+    case LEPT_OBJECT:
+        if (lhs->u.o.size != rhs->u.o.size)
+            return 0;
+        for (i = 0; i < lhs->u.o.size; i++) {
+            const char *key = lept_get_object_key(lhs, i);
+            size_t klen = lept_get_object_key_length(lhs, i);
+            if (lept_find_object_index(rhs, key, klen) == LEPT_KEY_NOT_EXIST)
+                return 0;
+            if (!lept_is_equal(lept_get_object_value(lhs, i), lept_find_object_value(rhs, key, klen)))
+                return 0;
+        }
+        return 1;
     default:
         return 1;
     }
