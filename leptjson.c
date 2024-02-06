@@ -650,14 +650,29 @@ void lept_popback_array_element(lept_value *v) {
 }
 
 lept_value* lept_insert_array_element(lept_value *v, size_t index) {
+    size_t i;
     assert(v != NULL && v->type == LEPT_ARRAY && index <= v->u.a.size);
-    /* \todo */
+    lept_pushback_array_element(v);
+    for (i = v->u.a.size-1; i > index; i--) {
+        lept_move(&v->u.a.e[i], &v->u.a.e[i-1]);
+    }
+    lept_init(&v->u.a.e[index]);
+    return &v->u.a.e[index];
     return NULL;
 }
 
 void lept_erase_array_element(lept_value *v, size_t index, size_t count) {
+    size_t i;
     assert(v != NULL && v->type == LEPT_ARRAY && index + count <= v->u.a.size);
-    /* \todo */
+    if (count == 0)
+        return;
+    for (i = 0; i < count; i++) {
+        lept_free(&v->u.a.e[index+i]);
+    }
+    for (i = index; i < v->u.a.size; i++) {
+        lept_move(&v->u.a.e[i], &v->u.a.e[count+i]);
+    }
+    v->u.a.size -= count;
 }
 
 void lept_set_object(lept_value *v, size_t capacity) {
