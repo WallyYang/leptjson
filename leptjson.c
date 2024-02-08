@@ -446,16 +446,25 @@ char* lept_stringify(const lept_value* v, size_t* length) {
 }
 
 void lept_copy(lept_value *dst, const lept_value *src) {
+    size_t i;
     assert(src != NULL && dst != NULL && src != dst);
     switch (src->type) {
     case LEPT_STRING:
         lept_set_string(dst, src->u.s.s, src->u.s.len);
         break;
     case LEPT_ARRAY:
-        /* \todo */
+        lept_set_array(dst, src->u.a.size);
+        for (i = 0; i < src->u.o.size; i++) {
+            lept_copy(lept_pushback_array_element(dst), &src->u.a.e[i]);
+        }
         break;
     case LEPT_OBJECT:
-        /* \todo */
+        lept_set_object(dst, src->u.o.size);
+        for (i = 0; i < src->u.o.size; i++) {
+            lept_copy(
+                lept_set_object_value(dst, src->u.o.m[i].k, src->u.o.m[i].klen),
+                &src->u.o.m[i].v);
+        }
         break;
     default:
         lept_free(dst);
