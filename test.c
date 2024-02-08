@@ -651,9 +651,16 @@ static void test_access_array() {
 
     i = lept_get_array_capacity(&a);
     lept_clear_array(&a);
-    EXPECT_EQ_SIZE_T(0, lept_get_array_size(&a));  /* capacity remains unchanged */
+    EXPECT_EQ_SIZE_T(0, lept_get_array_size(&a));
+    EXPECT_EQ_SIZE_T(i, lept_get_array_capacity(&a));  /* capacity remains unchanged */
     lept_shrink_array(&a);
     EXPECT_EQ_SIZE_T(0, lept_get_array_capacity(&a));
+
+    lept_set_string(&e, "Hello", 5);
+    lept_move(lept_pushback_array_element(&a), &e);  /* Test if element is freed */
+    lept_free(&e);
+    EXPECT_EQ_SIZE_T(1, lept_get_array_size(&a));
+    EXPECT_EQ_SIZE_T(1, lept_get_array_capacity(&a));
 
     lept_free(&a);
 #pragma GCC diagnostic pop
@@ -729,6 +736,11 @@ static void test_access_object() {
     EXPECT_EQ_SIZE_T(i, lept_get_object_capacity(&o));  /* Capacity remain unchanged */
     lept_shrink_object(&o);
     EXPECT_EQ_SIZE_T(0, lept_get_object_capacity(&o));
+
+    lept_set_string(&v, "extra_test", 10);
+    lept_move(lept_set_object_value(&o, "extra", 5), &v);
+    EXPECT_EQ_SIZE_T(1, lept_get_object_size(&o));
+    EXPECT_EQ_SIZE_T(1, lept_get_object_capacity(&o));
 
     lept_free(&o);
 #pragma GCC diagnostic pop

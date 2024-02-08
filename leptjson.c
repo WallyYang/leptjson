@@ -501,14 +501,16 @@ void lept_free(lept_value* v) {
         for (i = 0; i < v->u.a.size; i++) {
             lept_free(lept_get_array_element(v, i));
         }
-        free(v->u.a.e);
+        if (v->u.a.size > 0)
+            free(v->u.a.e);
         break;
     case LEPT_OBJECT:
         for (i = 0; i < v->u.o.size; i++) {
             free(v->u.o.m[i].k);
             lept_free(&v->u.o.m[i].v);
         }
-        free(v->u.o.m);
+        if (v->u.o.size > 0)
+            free(v->u.o.m);
         break;
     default:
         break;
@@ -621,8 +623,12 @@ size_t lept_get_array_capacity(const lept_value *v) {
 void lept_reserve_array(lept_value *v, size_t capacity) {
     assert(v != NULL && v->type == LEPT_ARRAY);
     if (v->u.a.capacity < capacity) {
+        if (v->u.a.capacity == 0) {
+            v->u.a.e = (lept_value*)malloc(capacity * sizeof(lept_value));
+        } else {
+            v->u.a.e = (lept_value*)realloc(v->u.a.e, capacity * sizeof(lept_value));
+        }
         v->u.a.capacity = capacity;
-        v->u.a.e = (lept_value*)realloc(v->u.a.e, capacity * sizeof(lept_value));
     }
 }
 
@@ -630,7 +636,11 @@ void lept_shrink_array(lept_value *v) {
     assert(v != NULL && v->type == LEPT_ARRAY);
     if (v->u.a.capacity > v->u.a.size) {
         v->u.a.capacity = v->u.a.size;
-        v->u.a.e = (lept_value*)realloc(v->u.a.e, v->u.a.capacity * sizeof(lept_value));
+        if (v->u.a.size != 0) {
+            v->u.a.e = (lept_value*)realloc(v->u.a.e, v->u.a.capacity * sizeof(lept_value));
+        } else {
+            free(v->u.a.e);
+        }
     }
 }
 
@@ -706,8 +716,12 @@ size_t lept_get_object_capacity(const lept_value *v) {
 void lept_reserve_object(lept_value *v, size_t capacity) {
     assert(v != NULL && v->type == LEPT_OBJECT);
     if (v->u.o.capacity < capacity) {
+        if (v->u.o.capacity == 0) {
+            v->u.o.m = (lept_member*)malloc(capacity * sizeof(lept_member));
+        } else {
+            v->u.o.m = (lept_member*)realloc(v->u.o.m, capacity * sizeof(lept_member));
+        }
         v->u.o.capacity = capacity;
-        v->u.o.m = (lept_member*)realloc(v->u.o.m, capacity * sizeof(lept_member));
     }
 }
 
@@ -715,7 +729,11 @@ void lept_shrink_object(lept_value *v) {
     assert(v != NULL && v->type == LEPT_OBJECT);
     if (v->u.o.capacity > v->u.o.size) {
         v->u.o.capacity = v->u.o.size;
-        v->u.o.m = (lept_member*)realloc(v->u.o.m, v->u.o.capacity * sizeof(lept_member));
+        if (v->u.o.size != 0) {
+            v->u.o.m = (lept_member*)realloc(v->u.o.m, v->u.o.capacity * sizeof(lept_member));
+        } else {
+            free(v->u.o.m);
+        }
     }
 }
 
