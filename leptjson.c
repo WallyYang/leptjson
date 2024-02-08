@@ -678,7 +678,7 @@ void lept_erase_array_element(lept_value *v, size_t index, size_t count) {
     for (i = 0; i < count; i++) {
         lept_free(&v->u.a.e[index+i]);
     }
-    for (i = index; i < v->u.a.size; i++) {
+    for (i = index; i + count < v->u.a.size; i++) {
         lept_move(&v->u.a.e[i], &v->u.a.e[count+i]);
     }
     v->u.a.size -= count;
