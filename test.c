@@ -659,8 +659,7 @@ static void test_access_array() {
 #pragma GCC diagnostic pop
 }
 
-static void test_acess_object() {
-#if 0
+static void test_access_object() {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat"
     lept_value o, v, *pv;
@@ -672,7 +671,7 @@ static void test_acess_object() {
         lept_set_object(&o, j);
         EXPECT_EQ_SIZE_T(0, lept_get_object_size(&o));
         EXPECT_EQ_SIZE_T(j, lept_get_object_capacity(&o));
-        for (i = 0; i < 1; i++) {
+        for (i = 0; i < 10; i++) {
             char key[2] = "a";
             key[0] += i;
             lept_init(&v);
@@ -682,58 +681,57 @@ static void test_acess_object() {
         EXPECT_EQ_SIZE_T(10, lept_get_object_size(&o));
         for (i = 0; i < 10; i++) {
             char key[] = "a";
-            key[i] += i;
+            key[0] += i;
             index = lept_find_object_index(&o, key, 1);
             EXPECT_TRUE(index != LEPT_KEY_NOT_EXIST);
             pv = lept_get_object_value(&o, index);
             EXPECT_EQ_DOUBLE((double)i, lept_get_number(pv));
         }
-
-        index = lept_find_object_index(&o, "j", 1);
-        EXPECT_TRUE(index != LEPT_KEY_NOT_EXIST);
-        lept_remove_object_value(&o, index);
-        index = lept_find_object_index(&o, "j", 1);
-        EXPECT_TRUE(index == LEPT_KEY_NOT_EXIST);
-        EXPECT_EQ_SIZE_T(9, lept_get_object_size(&o));
-
-        index = lept_find_object_index(&o, "a", 1);
-        EXPECT_TRUE(index != LEPT_KEY_NOT_EXIST);
-        lept_remove_object_value(&o, index);
-        index = lept_find_object_index(&o, "a", 1);
-        EXPECT_TRUE(index == LEPT_KEY_NOT_EXIST);
-        EXPECT_EQ_SIZE_T(8, lept_get_object_size(&o));
-
-        EXPECT_TRUE(lept_get_object_capacity(&o) > 8);
-        lept_shirnk_object(&o);
-        EXPECT_EQ_SIZE_T(8, lept_get_object_capacity(&o));
-        EXPECT_EQ_SIZE_T(8, lept_get_object_size(&o));
-        for (i = 0; i < 8; i++) {
-            char key[] = "a";
-            key[0] += i + 1;
-            EXPECT_EQ_DOUBLE(
-                (double)i + 1,
-                lept_get_number(lept_get_object_value(&o, lept_find_object_index(&o, key, 1))));
-        }
-
-        lept_set_string(&v, "Hello", 5);
-        lept_move(lept_set_object_value(&o, "World", 5), &v);  /* Test if element is freed */
-        lept_free(&v);
-
-        pv = lept_find_object_value(&o, "World", 5);
-        EXPECT_TRUE(pv != NULL);
-        EXPECT_EQ_STRING("Hello", lept_get_string(pv), lept_get_string_length(pv));
-
-        i = lept_get_object_capacity(&o);
-        lept_clear_object(&o);
-        EXPECT_EQ_SIZE_T(0, lept_get_object_size(&o));
-        EXPECT_EQ_SIZE_T(i, lept_get_object_capacity(&o));  /* Capacity remain unchanged */
-        lept_shrink_object(&o);
-        EXPECT_EQ_SIZE_T(0, lept_get_object_capacity(&o));
-
-        lept_free(&o);
     }
+
+    index = lept_find_object_index(&o, "j", 1);
+    EXPECT_TRUE(index != LEPT_KEY_NOT_EXIST);
+    lept_remove_object_value(&o, index);
+    index = lept_find_object_index(&o, "j", 1);
+    EXPECT_TRUE(index == LEPT_KEY_NOT_EXIST);
+    EXPECT_EQ_SIZE_T(9, lept_get_object_size(&o));
+
+    index = lept_find_object_index(&o, "a", 1);
+    EXPECT_TRUE(index != LEPT_KEY_NOT_EXIST);
+    lept_remove_object_value(&o, index);
+    index = lept_find_object_index(&o, "a", 1);
+    EXPECT_TRUE(index == LEPT_KEY_NOT_EXIST);
+    EXPECT_EQ_SIZE_T(8, lept_get_object_size(&o));
+
+    EXPECT_TRUE(lept_get_object_capacity(&o) > 8);
+    lept_shrink_object(&o);
+    EXPECT_EQ_SIZE_T(8, lept_get_object_capacity(&o));
+    EXPECT_EQ_SIZE_T(8, lept_get_object_size(&o));
+    for (i = 0; i < 8; i++) {
+        char key[] = "a";
+        key[0] += i + 1;
+        EXPECT_EQ_DOUBLE(
+            (double)i + 1,
+            lept_get_number(lept_get_object_value(&o, lept_find_object_index(&o, key, 1))));
+    }
+
+    lept_set_string(&v, "Hello", 5);
+    lept_move(lept_set_object_value(&o, "World", 5), &v);  /* Test if element is freed */
+    lept_free(&v);
+
+    pv = lept_find_object_value(&o, "World", 5);
+    EXPECT_TRUE(pv != NULL);
+    EXPECT_EQ_STRING("Hello", lept_get_string(pv), lept_get_string_length(pv));
+
+    i = lept_get_object_capacity(&o);
+    lept_clear_object(&o);
+    EXPECT_EQ_SIZE_T(0, lept_get_object_size(&o));
+    EXPECT_EQ_SIZE_T(i, lept_get_object_capacity(&o));  /* Capacity remain unchanged */
+    lept_shrink_object(&o);
+    EXPECT_EQ_SIZE_T(0, lept_get_object_capacity(&o));
+
+    lept_free(&o);
 #pragma GCC diagnostic pop
-#endif
 }
 
 static void test_access() {
@@ -742,7 +740,7 @@ static void test_access() {
     test_access_number();
     test_access_string();
     test_access_array();
-    test_acess_object();
+    test_access_object();
 }
 
 int main() {
